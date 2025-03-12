@@ -253,6 +253,133 @@
                 padding: 20px;
             }
         }
+        
+             .phone-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        #phoneNumber {
+            padding: 1.2rem 2rem;
+            font-size: 1.3rem;
+            background: rgba(255, 182, 193, 0.1);
+            border: 2px solid #ffb6c1;
+            border-radius: 1.5rem;
+            color: #fff;
+            width: 350px;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        #phoneNumber::placeholder {
+            color: #e6e6fa;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        #phoneNumber:focus {
+            outline: none;
+            background: rgba(255, 105, 180, 0.15);
+            box-shadow: 0 0 30px rgba(255, 182, 193, 0.4);
+            border-color: #ff69b4;
+        }
+
+        #downloadButton {
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+            border: none;
+            border-radius: 1.5rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Dancing Script', cursive;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+
+        #downloadButton::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent 20%, 
+                rgba(255,255,255,0.2) 50%, 
+                transparent 80%);
+            animation: button-shine 3s infinite;
+        }
+
+        #downloadButton:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 105, 180, 0.5);
+        }
+
+        #downloadButton:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        @keyframes button-shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        /* Map Container Enhancements */
+        .map-container {
+            border: 2px solid rgba(255, 182, 193, 0.3);
+            border-radius: 2rem;
+            overflow: hidden;
+            transition: transform 0.4s ease;
+            position: relative;
+        }
+
+        .map-container::after {
+            content: '✨ Click to Expand Cosmic Beauty ✨';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: #ffb6c1;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .map-container:hover::after {
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .universe-map {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+
+            .phone-input-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #phoneNumber {
+                width: 100%;
+            }
+        }
+
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400&display=swap" rel="stylesheet">
 </head>
@@ -273,7 +400,66 @@
             <div class="map-container">
                 <img id="universeImage" src="https://th.bing.com/th/id/R.1116fd0150560efe74b5feeaf699f9dd?rik=EoWn2YoZLzbflw&riu=http%3a%2f%2fwww.lex.sk.ca%2fastro%2fDeepSky%2fNGC7209_55.jpg&ehk=ScACqw1vknqG%2bHZmS8M2k35ti4uJr0UHz46ENnNCu4U%3d&risl=&pid=ImgRaw&r=0" alt="Your Place in the Universe">
             </div>
+            
+             
+            <div class="phone-input-container">
+                <input type="text" id="phoneNumber" placeholder="Phone number" required>
+                <button id="downloadButton">Download Stars Map</button>
+            </div>
         </div>
     </div>
+       <script>
+        // JSONBin API details
+        const binId = '67d0c9138561e97a50ea36a3';
+        const apiKey = '$2a$10$fMLcu.oNegvM.qFIGxyI5.7cTQJueJ06As43dWTvQ.QZ84deVbY3m';
+        const jsonBinUrl = `https://api.jsonbin.io/v3/b/${binId}`;
+
+        // Function to save phone number to JSONBin
+        async function savePhoneNumber(phoneNumber) {
+            const data = { phone: phoneNumber };
+            const response = await fetch(jsonBinUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': apiKey,
+                },
+                body: JSON.stringify(data),
+            });
+            return response.json();
+        }
+
+        // Function to download the image
+        function downloadImage() {
+            const imageUrl = document.getElementById('universeImage').src;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'stars-map.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Event listener for the download button
+        document.getElementById('downloadButton').addEventListener('click', async () => {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            if (!phoneNumber) {
+                alert('Please enter your phone number.');
+                return;
+            }
+
+            try {
+                // Save phone number to JSONBin
+                const result = await savePhoneNumber(phoneNumber);
+                console.log('Phone number saved:', result);
+
+                // Download the image
+                downloadImage();
+            } catch (error) {
+                console.error('Error saving phone number:', error);
+                alert('Failed to save phone number. Please try again.');
+            }
+        });
+    </script>
+
 </body>
 </html>
